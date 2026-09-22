@@ -47,6 +47,7 @@ jobs:
           haxelib install flixel-addons 2.11.0
           haxelib install flixel-ui 2.5.0
           haxelib install hscript 2.4.0
+          haxelib set hscript 2.4.0
           haxelib install actuate 1.9.0
           haxelib install newgrounds
           haxelib git extension-webm https://github.com/KadeDev/extension-webm
