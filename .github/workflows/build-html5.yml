@@ -43,7 +43,10 @@ jobs:
           haxelib install actuate 1.9.0
           haxelib install newgrounds 2.0.3
 
-          # Select the exact legacy versions used by this Kade Engine project.
+          haxelib run lime setup
+          haxelib run lime setup flixel
+
+          # Setup can reselect dependency versions, so force the legacy versions last.
           haxelib set lime 7.9.0
           haxelib set openfl 9.1.0
           haxelib set flixel 4.11.0
@@ -54,16 +57,14 @@ jobs:
           haxelib set actuate 1.9.0
           haxelib set newgrounds 2.0.3
 
+          echo "=== Selected Haxe libraries ==="
           haxelib list
-          echo "hscript path:"
+          echo "=== hscript path ==="
           haxelib path hscript
-          echo "lime path:"
+          echo "=== lime path ==="
           haxelib path lime
-          echo "openfl path:"
+          echo "=== openfl path ==="
           haxelib path openfl
-
-          haxelib run lime setup
-          haxelib run lime setup flixel
 
       - name: Build HTML5
         shell: bash
