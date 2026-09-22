@@ -311,6 +311,10 @@ class TitleState extends MusicBeatState
 				titleText.animation.play('press');
 
 			FlxG.camera.flash(FlxColor.WHITE, 1);
+			#if web
+			if (FlxG.sound.music == null || !FlxG.sound.music.playing)
+				FlxG.sound.playMusic(Paths.music('freakyMenu'), 0.7);
+			#end
 			FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
 
 			transitioning = true;
@@ -320,7 +324,14 @@ class TitleState extends MusicBeatState
 
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
+				#if web
+				Assets.loadLibrary("shared").onComplete(function(_)
+				{
+					FlxG.switchState(new SaveKeybinds());
+				});
+				#else
 				FlxG.switchState(new SaveKeybinds());
+				#end
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
