@@ -1,4 +1,4 @@
-name: Build HTML5
+name: Build and Deploy HTML5
 
 on:
   workflow_dispatch:
@@ -8,14 +8,19 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 jobs:
   html5:
     runs-on: ubuntu-22.04
+    environment:
+      name: github-pages
+      url: \${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Haxe 4.1.5
         uses: krdlab/setup-haxe@v2
@@ -45,7 +50,6 @@ jobs:
           haxelib run lime setup
           haxelib run lime setup flixel
 
-          # Setup can reselect dependency versions, so force the legacy versions last.
           haxelib set lime 7.9.0
           haxelib set openfl 9.1.0
           haxelib set flixel 4.11.0
@@ -70,9 +74,23 @@ jobs:
           set -e
           haxelib run lime build html5
 
-      - name: Upload HTML5 build
-        uses: actions/upload-artifact@v4
+      - name: Verify HTML5 output
+        shell: bash
+        run: |
+          set -e
+          test -f export/release/html5/bin/index.html
+          touch export/release/html5/bin/.nojekyll
+          echo "HTML5 build ready:"
+          ls -lah export/release/html5/bin | head -40
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
         with:
-          name: AccHankKE-HTML5
           path: export/release/html5/bin
-          if-no-files-found: error
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
