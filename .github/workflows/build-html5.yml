@@ -1,5 +1,7 @@
 name: Build and Deploy HTML5
 
+# HTML5 release pipeline: build and deploy the current main branch.
+
 on:
   workflow_dispatch:
   push:
