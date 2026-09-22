@@ -43,7 +43,7 @@
 	<!-- Load the large default asset library after the normal HTML5 preloader. -->
 	<library name="default" preload="false" if="web"/>
 
-	<assets path="assets/preload" rename="assets" exclude="*.ogg|*.webm|*.DS_Store" embed="false" preload="false" if="web"/>
+	<assets path="assets/preload" rename="assets" exclude="*.mp3|*.webm|*.DS_Store" embed="false" preload="false" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 	
 	<!-- <define name="PRELOAD_ALL" /> -->
@@ -60,9 +60,9 @@
 		<library name="shared"   preload="false" />
 	</section>
 	
-	<assets path="assets/songs"    library="songs"    exclude="*.ogg" embed="false" preload="false" if="web"/>
+	<assets path="assets/songs"    library="songs"    exclude="*.mp3|*.DS_Store" embed="false" preload="false" if="web"/>
 	<assets path="assets/songs"    library="songs"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/shared"   library="shared"   exclude="*.ogg" embed="false" preload="false" if="web"/>
+	<assets path="assets/shared"   library="shared"   exclude="*.mp3|*.DS_Store" embed="false" preload="false" if="web"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.mp3" unless="web"/>
 
 	
