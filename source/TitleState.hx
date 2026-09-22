@@ -153,9 +153,10 @@ class TitleState extends MusicBeatState
 			// music.loadStream(Paths.music('freakyMenu'));
 			// FlxG.sound.list.add(music);
 			// music.play();
+			#if !web
 			FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
-
 			FlxG.sound.music.fadeIn(4, 0, 0.7);
+			#end
 		}
 
 		Conductor.changeBPM(102);
@@ -237,12 +238,21 @@ class TitleState extends MusicBeatState
 
 		FlxTween.tween(credTextShit, {y: credTextShit.y + 20}, 2.9, {ease: FlxEase.quadInOut, type: PINGPONG});
 
+		#if web
+		FlxG.mouse.visible = true;
+		// Browsers may block autoplay, which prevents Conductor from advancing
+		// the intro beats. Remove the intro overlay immediately on web so the
+		// title screen is still rendered.
+		skipIntro();
+		initialized = true;
+		#else
 		FlxG.mouse.visible = false;
 
 		if (initialized)
 			skipIntro();
 		else
 			initialized = true;
+		#end
 
 		// credGroup.add(credTextShit);
 	}
