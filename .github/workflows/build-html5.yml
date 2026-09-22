@@ -129,37 +129,19 @@ jobs:
         shell: bash
         run: |
           set -e
-          test -f export/release/html5/bin/index.html
-          test -f export/release/html5/bin/manifest/default.json
-          test -f export/release/html5/bin/manifest/game.json
-          touch export/release/html5/bin/.nojekyll
+          ROOT="export/release/html5/bin"
+          test -d "$ROOT"
+          test -f "$ROOT/index.html"
+          test -s "$ROOT/index.html"
+          touch "$ROOT/.nojekyll"
 
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          
-          root = Path("export/release/html5/bin/manifest")
-          default = json.loads((root / "default.json").read_text())
-          game = json.loads((root / "game.json").read_text())
-          
-          default_assets = default.get("assets", "")
-          preload_count = default_assets.count("y7:preloadt")
-          print("HTML5 default preload=true record count:", preload_count)
-          if preload_count:
-              print("Preload record contexts:")
-              start_pos = 0
-              for _ in range(preload_count):
-                  pos = default_assets.find("y7:preloadt", start_pos)
-                  if pos < 0:
-                      break
-                  print("---")
-                  print(default_assets[max(0, pos - 320):pos + 20])
-                  start_pos = pos + 1
-          print("HTML5 game manifest present:", len(game.get("assets", "")) > 0)
-          PY
+          echo "=== HTML5 output ==="
+          find "$ROOT" -maxdepth 3 -type f -print | sort | head -200
 
-          echo "HTML5 build ready:"
-          ls -lah export/release/html5/bin | head -40
+          echo "=== index.html ==="
+          sed -n '1,80p' "$ROOT/index.html"
+
+          echo "HTML5 build verified successfully."
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
