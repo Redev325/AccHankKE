@@ -40,7 +40,7 @@
 
 	<classpath name="source" />
 
-	<!-- Load the large default asset library after the normal HTML5 preloader. -->
+	<!-- Keep the game assets in a lazy library on HTML5. -->
 	<library name="game" preload="false" if="web"/>
 
 	<assets path="assets/preload" rename="assets" library="game" exclude="*.mp3|*.webm|*.DS_Store" embed="false" preload="false" if="web"/>
@@ -91,7 +91,7 @@
 	<haxelib name="actuate" />
 
 	<!--In case you want to use the ui package-->
-	<haxelib name="flixel-ui" />
+	<haxelib name="flixel-ui" if="!web" />
 	<haxelib name="newgrounds" if="desktop"/>
 	<haxelib name="faxe" if='switch'/>
 	<haxelib name="polymod" if="desktop"/>
