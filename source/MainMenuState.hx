@@ -22,7 +22,9 @@ import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
 import flixel.util.FlxTimer;
+#if !web
 import io.newgrounds.NG;
+#end
 import lime.app.Application;
 import flixel.addons.display.FlxBackdrop;
 //import flixel.system.FlxAssets;
