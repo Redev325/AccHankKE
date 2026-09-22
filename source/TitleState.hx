@@ -155,13 +155,17 @@ class TitleState extends MusicBeatState
 			// music.play();
 			#if web
 			Assets.loadSound(Paths.music('freakyMenu', 'startup')).onComplete(function(sound) {
-				FlxG.sound.playMusic(sound, 0);
+				if (sound != null)
+				{
+					FlxG.sound.playMusic(sound, 0);
+					if (FlxG.sound.music != null)
+						FlxG.sound.music.fadeIn(4, 0, 0.7);
+				}
 			});
 		#else
 			FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
-		#end
-
 			FlxG.sound.music.fadeIn(4, 0, 0.7);
+		#end
 		}
 
 		Conductor.changeBPM(102);
