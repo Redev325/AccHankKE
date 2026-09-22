@@ -40,10 +40,10 @@
 
 	<classpath name="source" />
 
-	<!-- Keep the game assets in a lazy library on HTML5. -->
-	<library name="game" preload="false" if="web"/>
+	<!-- Keep the default game asset library lazy on HTML5. -->
+	<library name="default" preload="false" if="web"/>
 
-	<assets path="assets/preload" rename="assets" library="game" exclude="*.mp3|*.webm|*.DS_Store" embed="false" preload="false" if="web"/>
+	<assets path="assets/preload" rename="assets" exclude="*.ogg|*.webm|*.DS_Store" embed="false" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 	
 	<!-- <define name="PRELOAD_ALL" /> -->
@@ -60,9 +60,9 @@
 		<library name="shared"   preload="false" />
 	</section>
 	
-	<assets path="assets/songs"    library="songs"    exclude="*.mp3|*.DS_Store" embed="false" preload="false" if="web"/>
+	<assets path="assets/songs"    library="songs"    exclude="*.ogg|*.DS_Store" embed="false" if="web"/>
 	<assets path="assets/songs"    library="songs"    exclude="*.mp3" unless="web"/>
-	<assets path="assets/shared"   library="shared"   exclude="*.mp3|*.DS_Store" embed="false" preload="false" if="web"/>
+	<assets path="assets/shared"   library="shared"   exclude="*.ogg|*.DS_Store" embed="false" if="web"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.mp3" unless="web"/>
 
 	
@@ -77,7 +77,7 @@
 		THEN UHHH I USED THE NAME OF THE FONT WITH SETFORMAT() ON THE TEXT!!!
 		NOT USING A DIRECT THING TO THE ASSET!!!
 	-->
-	<assets path="assets/fonts" rename="assets/fonts" library="game" embed="false" preload="false" if="web"/>
+	<assets path="assets/fonts" rename="assets/fonts" embed="false" if="web"/>
 	<assets path="assets/fonts" embed="true" unless="web"/>
 	<!-- _______________________________ Libraries ______________________________ -->
 
