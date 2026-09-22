@@ -82,10 +82,6 @@ from pathlib import Path
 path = Path(sys.argv[1])
 text = path.read_text()
 
-replacements = {
-    'embed="true" />': 'embed="true" preload="false" />',
-}
-
 # Only change the four HaxeFlixel core assets that are preloaded on web.
 targets = [
     '<assets path="assets/sounds" rename="flixel/sounds" include="*.mp3" if="web || air" embed="true" />',
@@ -93,9 +89,12 @@ targets = [
     '<assets path="assets/fonts/nokiafc22.ttf" rename="flixel/fonts/nokiafc22.ttf" embed="true" />',
     '<assets path="assets/fonts/monsterrat.ttf" rename="flixel/fonts/monsterrat.ttf" embed="true" />',
 ]
+missing = [target for target in targets if target not in text]
+if missing:
+    raise SystemExit("HaxeFlixel include.xml layout changed; expected preload declarations were not found: " + repr(missing))
+
 for target in targets:
-    if target in text:
-        text = text.replace(target, target[:-3] + ' preload="false" />')
+    text = text.replace(target, target[:-3] + ' preload="false" />')
 
 path.write_text(text)
 PY
