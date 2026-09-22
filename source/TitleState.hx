@@ -153,19 +153,9 @@ class TitleState extends MusicBeatState
 			// music.loadStream(Paths.music('freakyMenu'));
 			// FlxG.sound.list.add(music);
 			// music.play();
-			#if web
-			Assets.loadSound(Paths.music('freakyMenu', 'startup')).onComplete(function(sound) {
-				if (sound != null)
-				{
-					FlxG.sound.playMusic(sound, 0);
-					if (FlxG.sound.music != null)
-						FlxG.sound.music.fadeIn(4, 0, 0.7);
-				}
-			});
-		#else
 			FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+
 			FlxG.sound.music.fadeIn(4, 0, 0.7);
-		#end
 		}
 
 		Conductor.changeBPM(102);
@@ -179,7 +169,7 @@ class TitleState extends MusicBeatState
 
 		if(Main.watermarks) {
 			logoBl = new FlxSprite(-150, -100);
-			logoBl.frames = #if web Paths.getSparrowAtlas('KadeEngineLogoBumpin', 'startup') #else Paths.getSparrowAtlas('KadeEngineLogoBumpin') #end;
+			logoBl.frames = Paths.getSparrowAtlas('KadeEngineLogoBumpin');
 			logoBl.antialiasing = true;
 			logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
 			logoBl.animation.play('bump');
@@ -198,7 +188,7 @@ class TitleState extends MusicBeatState
 		}
 
 		gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
-		gfDance.frames = #if web Paths.getSparrowAtlas('gfDanceTitle', 'startup') #else Paths.getSparrowAtlas('gfDanceTitle') #end;
+		gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
 		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
 		gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
 		gfDance.antialiasing = true;
@@ -206,7 +196,7 @@ class TitleState extends MusicBeatState
 		add(logoBl);
 
 		titleText = new FlxSprite(100, FlxG.height * 0.8);
-		titleText.frames = #if web Paths.getSparrowAtlas('titleEnter', 'startup') #else Paths.getSparrowAtlas('titleEnter') #end;
+		titleText.frames = Paths.getSparrowAtlas('titleEnter');
 		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
 		titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 		titleText.antialiasing = true;
@@ -237,7 +227,7 @@ class TitleState extends MusicBeatState
 
 		credTextShit.visible = false;
 
-		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(#if web Paths.image('newgrounds_logo', 'startup') #else Paths.image('newgrounds_logo') #end);
+		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
 		add(ngSpr);
 		ngSpr.visible = false;
 		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
@@ -259,7 +249,7 @@ class TitleState extends MusicBeatState
 
 	function getIntroTextShit():Array<Array<String>>
 	{
-		var fullText:String = Assets.getText(#if web Paths.txt('introText', 'startup') #else Paths.txt('introText') #end);
+		var fullText:String = Assets.getText(Paths.txt('introText'));
 
 		var firstArray:Array<String> = fullText.split('\n');
 		var swagGoodArray:Array<Array<String>> = [];
@@ -311,11 +301,7 @@ class TitleState extends MusicBeatState
 				titleText.animation.play('press');
 
 			FlxG.camera.flash(FlxColor.WHITE, 1);
-			#if web
-			FlxG.sound.play(Paths.sound('confirmMenu', 'startup'), 0.7);
-		#else
 			FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
-		#end
 
 			transitioning = true;
 			// FlxG.sound.music.stop();
@@ -324,14 +310,7 @@ class TitleState extends MusicBeatState
 
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
-				#if web
-				Assets.loadLibrary("default").onComplete(function(_)
-				{
-					FlxG.switchState(new SaveKeybinds());
-				});
-				#else
 				FlxG.switchState(new SaveKeybinds());
-				#end
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
