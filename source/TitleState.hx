@@ -65,11 +65,6 @@ class TitleState extends MusicBeatState
 		FlxG.save.data.userLevel = null;
 		FlxG.save.data.userRank = null;
 
-		@:privateAccess
-		{
-			trace("Loaded " + openfl.Assets.getLibrary("default").assetsLoaded + " assets (DEFAULT)");
-		}
-		
 		PlayerSettings.init();
 
 		#if windows
