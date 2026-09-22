@@ -6,6 +6,11 @@ on:
     branches:
       - main
 
+# Prevent older HTML5 deployments from racing the newest build.
+concurrency:
+  group: github-pages-html5
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pages: write
