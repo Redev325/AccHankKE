@@ -10,7 +10,7 @@ on:
 
 # Prevent older HTML5 deployments from racing the newest build.
 concurrency:
-  group: github-pages-html5
+  group: github-pages-html5-v2
   cancel-in-progress: true
 
 permissions:
