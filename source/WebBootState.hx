@@ -18,7 +18,7 @@ class WebBootState extends FlxState
         status.color = FlxColor.WHITE;
         add(status);
 
-        Assets.loadLibrary("default").onComplete(function(_)
+        Assets.loadLibrary("game").onComplete(function(_)
         {
             FlxG.switchState(new TitleState());
         });
