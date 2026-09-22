@@ -48,6 +48,7 @@ jobs:
           haxelib install flixel 4.11.0
           haxelib install flixel-tools 1.5.1
           haxelib install flixel-addons 2.11.0
+          haxelib install flixel-ui 2.5.0
           haxelib install hscript 2.4.0
           haxelib install actuate 1.9.0
 
@@ -59,6 +60,7 @@ jobs:
           haxelib set flixel 4.11.0
           haxelib set flixel-tools 1.5.1
           haxelib set flixel-addons 2.11.0
+          haxelib set flixel-ui 2.5.0
           haxelib set hscript 2.4.0
           haxelib set actuate 1.9.0
 
