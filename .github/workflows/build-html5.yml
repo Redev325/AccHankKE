@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-22.04
     environment:
       name: github-pages
-      url: \${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -74,35 +74,50 @@ jobs:
           haxelib path openfl
 
           # Lime 7.9's HTML5 preloader waits on assets marked preload in
-          # HaxeFlixel's include.xml. Keep Flixel's helper fonts/audio lazy;
-          # the Flixel preloader graphics are embedded in FlxPreloader itself.
-          FLIXEL_DIR="$(haxelib path flixel | head -n 1)"
-          python3 - "$FLIXEL_DIR/include.xml" <<'PY'
-import sys
+          # dependency include.xml files. Keep package assets lazy and let
+          # the game request them when needed after the normal FlxPreloader.
+          python3 - <<'PY'
+import subprocess
 from pathlib import Path
 
-path = Path(sys.argv[1])
-text = path.read_text()
+packages = ["flixel", "flixel-ui"]
 
-# Only change the four HaxeFlixel core assets that are preloaded on web.
-targets = [
-    '<assets path="assets/sounds" rename="flixel/sounds" include="*.mp3" if="web || air" embed="true" />',
-    '<assets path="assets/sounds" rename="flixel/sounds" include="*.ogg" unless="flash || air" embed="true" />',
-    '<assets path="assets/fonts/nokiafc22.ttf" rename="flixel/fonts/nokiafc22.ttf" embed="true" />',
-    '<assets path="assets/fonts/monsterrat.ttf" rename="flixel/fonts/monsterrat.ttf" embed="true" />',
-]
-missing = [target for target in targets if target not in text]
-if missing:
-    raise SystemExit("HaxeFlixel include.xml layout changed; expected preload declarations were not found: " + repr(missing))
+for package in packages:
+    root = subprocess.check_output(
+        ["haxelib", "path", package], text=True
+    ).splitlines()[0].strip()
+    include = Path(root) / "include.xml"
 
-for target in targets:
-    text = text.replace(target, target[:-3] + ' preload="false" />')
+    if not include.exists():
+        raise SystemExit(f"Missing include.xml for {package}: {include}")
 
-path.write_text(text)
+    text = include.read_text()
+    lines = text.splitlines()
+    changed = 0
+
+    for i, line in enumerate(lines):
+        if "<assets " in line and "preload=" not in line and line.rstrip().endswith("/>"):
+            lines[i] = line.rstrip()[:-2] + ' preload="false" />'
+            changed += 1
+
+    if changed == 0:
+        raise SystemExit(f"No asset declarations were patched in {include}")
+
+    include.write_text("\n".join(lines) + "\n")
+    print(f"Patched {package}: {include} ({changed} asset declarations)")
+
+    verify = include.read_text()
+    if '<assets ' in verify and 'preload="true"' in verify:
+        raise SystemExit(f"Found preload=true in patched {package} include.xml")
 PY
 
-          echo "=== Patched HaxeFlixel include.xml ==="
-          grep -E 'flixel/sounds|nokiafc22|monsterrat' "$FLIXEL_DIR/include.xml"
+          echo "=== HaxeFlixel include.xml ==="
+          FLIXEL_DIR="$(haxelib path flixel | head -n 1)"
+          grep -E '<assets |nokiafc22|monsterrat' "$FLIXEL_DIR/include.xml"
+
+          echo "=== FlxUI include.xml ==="
+          FLIXEL_UI_DIR="$(haxelib path flixel-ui | head -n 1)"
+          grep -E '<assets |flixel-ui' "$FLIXEL_UI_DIR/include.xml"
 
       - name: Build HTML5
         shell: bash
@@ -115,7 +130,26 @@ PY
         run: |
           set -e
           test -f export/release/html5/bin/index.html
+          test -f export/release/html5/bin/manifest/default.json
+          test -f export/release/html5/bin/manifest/game.json
           touch export/release/html5/bin/.nojekyll
+
+          python3 - <<'PY'
+import json
+from pathlib import Path
+
+root = Path("export/release/html5/bin/manifest")
+default = json.loads((root / "default.json").read_text())
+game = json.loads((root / "game.json").read_text())
+
+default_assets = default.get("assets", "")
+if "y7:preloadt" in default_assets:
+    raise SystemExit("HTML5 default manifest still contains preload=true assets")
+
+print("HTML5 default preloaded assets: 0")
+print("HTML5 game manifest present:", len(game.get("assets", "")) > 0)
+PY
+
           echo "HTML5 build ready:"
           ls -lah export/release/html5/bin | head -40
 
