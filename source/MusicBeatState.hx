@@ -8,12 +8,15 @@ import flixel.util.FlxColor;
 import openfl.Lib;
 import Conductor.BPMChangeEvent;
 import flixel.FlxG;
+import flixel.FlxState;
 import flixel.addons.transition.FlxTransitionableState;
+#if !web
 import flixel.addons.ui.FlxUIState;
+#end
 import flixel.math.FlxRect;
 import flixel.util.FlxTimer;
 
-class MusicBeatState extends FlxUIState
+class MusicBeatState extends #if web FlxState #else FlxUIState #end
 {
 	private var lastBeat:Float = 0;
 	private var lastStep:Float = 0;
