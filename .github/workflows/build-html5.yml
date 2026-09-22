@@ -67,7 +67,6 @@ jobs:
           haxelib set actuate 1.9.0
           haxelib set newgrounds 2.0.3
 
-          haxelib git extension-webm https://github.com/KadeDev/extension-webm
           haxelib run lime setup
           haxelib run lime setup flixel
 
