@@ -48,7 +48,7 @@
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 
 	<!-- Only the assets required to create the title screen are preloaded for HTML5. -->
-	<assets path="assets/preload/images" rename="assets/startup/images" library="startup" include="KadeEngineLogoBumpin.png|KadeEngineLogoBumpin.xml|gfDanceTitle.png|gfDanceTitle.xml|titleEnter.png|titleEnter.xml|alphabet.png|alphabet.xml|newgrounds_logo.png" if="web"/>
+	<assets path="assets/preload/images" rename="assets/startup/images" library="startup" include="KadeEngineLogoBumpin.png|KadeEngineLogoBumpin.xml|logoBumpin.png|logoBumpin.xml|gfDanceTitle.png|gfDanceTitle.xml|titleEnter.png|titleEnter.xml|alphabet.png|alphabet.xml|newgrounds_logo.png" if="web"/>
 	<assets path="assets/preload/data" rename="assets/startup/data" library="startup" include="introText.txt" if="web"/>
 	<assets path="assets/preload/music" rename="assets/startup/music" library="startup" include="freakyMenu.mp3" if="web"/>
 	<assets path="assets/preload/sounds" rename="assets/startup/sounds" library="startup" include="confirmMenu.mp3" if="web"/>
