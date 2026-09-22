@@ -40,6 +40,9 @@
 
 	<classpath name="source" />
 
+	<!-- Load the large default asset library after the normal HTML5 preloader. -->
+	<library name="default" preload="false" if="web"/>
+
 	<assets path="assets/preload" rename="assets" exclude="*.ogg|*.webm|*.DS_Store" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 	
