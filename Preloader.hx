@@ -19,39 +19,42 @@ class Preloader extends FlxBasePreloader
     }
      
     var logo:Sprite;
+    var logoScale:Float = 1.0;
      
     override function create():Void 
     {
         this._width = Lib.current.stage.stageWidth;
         this._height = Lib.current.stage.stageHeight;
          
-        var ratio:Float = this._width / 2560; //This allows us to scale assets depending on the size of the screen.
-         
+        var bitmap = new Bitmap(new LogoImage(0,0));
         logo = new Sprite();
-        logo.addChild(new Bitmap(new LogoImage(0,0))); //Sets the graphic of the sprite to a Bitmap object, which uses our embedded BitmapData class.
-        logo.scaleX = logo.scaleY = ratio;
-        logo.x = ((this._width) / 2) - ((logo.width) / 2);
-        logo.y = (this._height / 2) - ((logo.height) / 2);
-        addChild(logo); //Adds the graphic to the NMEPreloader's buffer.
+        logo.addChild(bitmap);
+
+        // Keep the preloader artwork centered and fully visible on HTML5.
+        // The old code enlarged it to width / 1280 at the end of loading,
+        // which made the 2560px artwork overflow the browser.
+        logoScale = this._width / 2560;
+        if (this._height / bitmap.height < logoScale)
+            logoScale = this._height / bitmap.height;
+        logoScale = Math.min(logoScale, 1.0);
+         
+        logo.scaleX = logo.scaleY = logoScale;
+        logo.x = (this._width - logo.width) / 2;
+        logo.y = (this._height - logo.height) / 2;
+        addChild(logo);
          
         super.create();
     }
      
     override function update(Percent:Float):Void 
     {
-        if(Percent < 69)
-        {
-            logo.scaleX += Percent / 1920;
-            logo.scaleY += Percent / 1920;
-            logo.x -= Percent * 0.6;
-            logo.y -= Percent / 2;
-        }else{
-            logo.scaleX = this._width / 1280;
-            logo.scaleY = this._width / 1280;
-            logo.x = ((this._width) / 2) - ((logo.width) / 2);
-            logo.y = (this._height / 2) - ((logo.height) / 2);
-        }
-        
+        // Do not animate the artwork based on loading percentage.
+        // This prevents the HTML5 preloader from growing/cropping at the
+        // 60-80% range while assets are still being fetched.
+        logo.scaleX = logo.scaleY = logoScale;
+        logo.x = (this._width - logo.width) / 2;
+        logo.y = (this._height - logo.height) / 2;
+         
         super.update(Percent);
     }
 }
