@@ -77,39 +77,39 @@ jobs:
           # dependency include.xml files. Keep package assets lazy and let
           # the game request them when needed after the normal FlxPreloader.
           python3 - <<'PY'
-import subprocess
-from pathlib import Path
-
-packages = ["flixel", "flixel-ui"]
-
-for package in packages:
-    root = subprocess.check_output(
-        ["haxelib", "path", package], text=True
-    ).splitlines()[0].strip()
-    include = Path(root) / "include.xml"
-
-    if not include.exists():
-        raise SystemExit(f"Missing include.xml for {package}: {include}")
-
-    text = include.read_text()
-    lines = text.splitlines()
-    changed = 0
-
-    for i, line in enumerate(lines):
-        if "<assets " in line and "preload=" not in line and line.rstrip().endswith("/>"):
-            lines[i] = line.rstrip()[:-2] + ' preload="false" />'
-            changed += 1
-
-    if changed == 0:
-        raise SystemExit(f"No asset declarations were patched in {include}")
-
-    include.write_text("\n".join(lines) + "\n")
-    print(f"Patched {package}: {include} ({changed} asset declarations)")
-
-    verify = include.read_text()
-    if '<assets ' in verify and 'preload="true"' in verify:
-        raise SystemExit(f"Found preload=true in patched {package} include.xml")
-PY
+          import subprocess
+          from pathlib import Path
+          
+          packages = ["flixel", "flixel-ui"]
+          
+          for package in packages:
+              root = subprocess.check_output(
+                  ["haxelib", "path", package], text=True
+              ).splitlines()[0].strip()
+              include = Path(root) / "include.xml"
+          
+              if not include.exists():
+                  raise SystemExit(f"Missing include.xml for {package}: {include}")
+          
+              text = include.read_text()
+              lines = text.splitlines()
+              changed = 0
+          
+              for i, line in enumerate(lines):
+                  if "<assets " in line and "preload=" not in line and line.rstrip().endswith("/>"):
+                      lines[i] = line.rstrip()[:-2] + ' preload="false" />'
+                      changed += 1
+          
+              if changed == 0:
+                  raise SystemExit(f"No asset declarations were patched in {include}")
+          
+              include.write_text("\n".join(lines) + "\n")
+              print(f"Patched {package}: {include} ({changed} asset declarations)")
+          
+              verify = include.read_text()
+              if '<assets ' in verify and 'preload="true"' in verify:
+                  raise SystemExit(f"Found preload=true in patched {package} include.xml")
+          PY
 
           echo "=== HaxeFlixel include.xml ==="
           FLIXEL_DIR="$(haxelib path flixel | head -n 1)"
@@ -135,20 +135,20 @@ PY
           touch export/release/html5/bin/.nojekyll
 
           python3 - <<'PY'
-import json
-from pathlib import Path
-
-root = Path("export/release/html5/bin/manifest")
-default = json.loads((root / "default.json").read_text())
-game = json.loads((root / "game.json").read_text())
-
-default_assets = default.get("assets", "")
-if "y7:preloadt" in default_assets:
-    raise SystemExit("HTML5 default manifest still contains preload=true assets")
-
-print("HTML5 default preloaded assets: 0")
-print("HTML5 game manifest present:", len(game.get("assets", "")) > 0)
-PY
+          import json
+          from pathlib import Path
+          
+          root = Path("export/release/html5/bin/manifest")
+          default = json.loads((root / "default.json").read_text())
+          game = json.loads((root / "game.json").read_text())
+          
+          default_assets = default.get("assets", "")
+          if "y7:preloadt" in default_assets:
+              raise SystemExit("HTML5 default manifest still contains preload=true assets")
+          
+          print("HTML5 default preloaded assets: 0")
+          print("HTML5 game manifest present:", len(game.get("assets", "")) > 0)
+          PY
 
           echo "HTML5 build ready:"
           ls -lah export/release/html5/bin | head -40
