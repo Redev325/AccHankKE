@@ -141,6 +141,40 @@ jobs:
           echo "=== index.html ==="
           sed -n '1,80p' "$ROOT/index.html"
 
+          echo "=== manifest audit ==="
+          python3 - <<'PY'
+import json
+from pathlib import Path
+
+manifest_dir = Path("export/release/html5/bin/manifest")
+default_path = manifest_dir / "default.json"
+game_path = manifest_dir / "game.json"
+
+if not default_path.exists():
+    raise SystemExit("Missing manifest/default.json")
+if not game_path.exists():
+    raise SystemExit("Missing manifest/game.json")
+
+default_assets = json.loads(default_path.read_text()).get("assets", "")
+game_assets = json.loads(game_path.read_text()).get("assets", "")
+
+preloads = []
+cursor = 0
+while True:
+    pos = default_assets.find("y7:preloadt", cursor)
+    if pos < 0:
+        break
+    start = default_assets.rfind("aoy4:", 0, pos)
+    preloads.append(default_assets[start:pos + 20])
+    cursor = pos + 1
+
+print("default preload records:", len(preloads))
+for item in preloads:
+    print(item)
+
+print("game manifest bytes:", len(game_assets))
+PY
+
           echo "HTML5 build verified successfully."
 
       - name: Configure GitHub Pages
