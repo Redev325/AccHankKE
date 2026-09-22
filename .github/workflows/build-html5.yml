@@ -41,7 +41,6 @@ jobs:
           haxelib install flixel-ui 2.5.0
           haxelib install hscript 2.4.0
           haxelib install actuate 1.9.0
-          haxelib install newgrounds 2.0.3
 
           haxelib run lime setup
           haxelib run lime setup flixel
@@ -55,7 +54,6 @@ jobs:
           haxelib set flixel-ui 2.5.0
           haxelib set hscript 2.4.0
           haxelib set actuate 1.9.0
-          haxelib set newgrounds 2.0.3
 
           echo "=== Selected Haxe libraries ==="
           haxelib list
