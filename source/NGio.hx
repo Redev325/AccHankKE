@@ -1,5 +1,7 @@
 package;
 
+#if !web
+
 import flixel.FlxG;
 import flixel.util.FlxSignal;
 import flixel.util.FlxTimer;
@@ -198,3 +200,28 @@ class NGio
 		}
 	}
 }
+
+
+#else
+
+class NGio
+{
+	public static var isLoggedIn:Bool = false;
+	public static var scoreboardsLoaded:Bool = false;
+	public static var scoreboardArray:Array<Dynamic> = [];
+	public static var GAME_VER:String = "";
+	public static var GAME_VER_NUMS:String = "";
+	public static var gotOnlineVer:Bool = false;
+
+	public static function noLogin(api:String):Void {}
+
+	public function new(api:String, encKey:String, ?sessionId:String) {}
+
+	public static function postScore(score:Int = 0, song:String):Void {}
+
+	public static function logEvent(event:String):Void {}
+
+	public static function unlockMedal(id:Int):Void {}
+}
+
+#end
