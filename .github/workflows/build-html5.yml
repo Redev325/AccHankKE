@@ -17,29 +17,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y neko git wget tar
+      - name: Setup Haxe 4.1.5
+        uses: krdlab/setup-haxe@v2
+        with:
+          haxe-version: 4.1.5
 
-      - name: Install Haxe 4.1.5
+      - name: Verify Haxe toolchain
         shell: bash
         run: |
-          wget -q https://github.com/HaxeFoundation/haxe/releases/download/4.1.5/haxe-4.1.5-linux64.tar.gz
-          mkdir -p "$HOME/haxe"
-          tar -xzf haxe-4.1.5-linux64.tar.gz -C "$HOME/haxe"
-          echo "$HOME/haxe/haxe_20201231082044_5e33a78aa" >> "$GITHUB_PATH"
-          echo "HAXE_INSTALLDIR=$HOME/haxe/haxe_20201231082044_5e33a78aa" >> "$GITHUB_ENV"
-
-      - name: Configure Haxelib
-        shell: bash
-        run: |
-          mkdir -p "$HOME/haxelib"
-          haxelib setup "$HOME/haxelib"
+          set -e
+          haxe -version
+          haxelib version
 
       - name: Install Haxe libraries
         shell: bash
         run: |
+          set -e
           haxelib install lime 7.9.0
           haxelib install openfl 9.1.0
           haxelib install flixel 4.11.0
@@ -50,22 +43,24 @@ jobs:
           haxelib install actuate 1.9.0
           haxelib install newgrounds 2.0.3
 
-          # Force the legacy versions instead of whatever newer versions are also installed.
+          # Select the exact legacy versions used by this Kade Engine project.
           haxelib set lime 7.9.0
           haxelib set openfl 9.1.0
           haxelib set flixel 4.11.0
           haxelib set flixel-tools 1.5.1
           haxelib set flixel-addons 2.11.0
-          haxelib list
-          echo "Resolved hscript:"
-          haxelib path hscript
-          echo "Resolved lime:"
-          haxelib path lime
-          echo "Resolved openfl:"
-          haxelib path openfl
-          haxelib run lime build html5
+          haxelib set flixel-ui 2.5.0
+          haxelib set hscript 2.4.0
           haxelib set actuate 1.9.0
           haxelib set newgrounds 2.0.3
+
+          haxelib list
+          echo "hscript path:"
+          haxelib path hscript
+          echo "lime path:"
+          haxelib path lime
+          echo "openfl path:"
+          haxelib path openfl
 
           haxelib run lime setup
           haxelib run lime setup flixel
@@ -73,7 +68,7 @@ jobs:
       - name: Build HTML5
         shell: bash
         run: |
-          haxelib list
+          set -e
           haxelib run lime build html5
 
       - name: Upload HTML5 build
