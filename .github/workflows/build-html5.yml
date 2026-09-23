@@ -127,41 +127,27 @@ jobs:
           set -e
           haxelib run lime build html5
 
-      - name: Remove generated HTML5 asset preloads
+      - name: Verify HTML5 manifests
         shell: bash
         run: |
           set -e
           ROOT="export/release/html5/bin"
-          MANIFEST="$ROOT/manifest/game.json"
 
-          test -f "$MANIFEST"
+          test -f "$ROOT/index.html"
 
-          python3 - "$MANIFEST" <<'PY'
-          import json
-          import sys
-          from pathlib import Path
+          # The browser must start with only the tiny startup library.
+          test -f "$ROOT/manifest/startup.json"
+          ! grep -q 'y7:preloadt' "$ROOT/manifest/startup.json"
 
-          manifest_path = Path(sys.argv[1])
-          manifest = json.loads(manifest_path.read_text())
-          assets = manifest.get("assets")
+          # Full game and fonts are loaded later by the game itself.
+          test -f "$ROOT/manifest/game.json"
+          test -f "$ROOT/manifest/fonts.json"
 
-          if not isinstance(assets, str):
-              raise SystemExit("manifest/game.json has an unexpected assets format")
+          echo "=== HTML5 manifest sizes ==="
+          wc -c "$ROOT"/manifest/*.json
 
-          # Lime/OpenFL stores the version-2 asset list as a Haxe-serialized
-          # string. The generated web manifest can mark some fonts as preload
-          # even though Project.xml requests lazy web assets. A single stuck
-          # font preload prevents Assets.loadLibrary("game") from completing.
-          assets = assets.replace("y7:preloadt", "").replace("y7:preloadf", "")
-          manifest["assets"] = assets
-
-          manifest_path.write_text(json.dumps(manifest, separators=(",", ":")))
-
-          if "y7:preloadt" in assets or "y7:preloadf" in assets:
-              raise SystemExit("Generated game manifest still contains preload flags")
-
-          print(f"Sanitized {manifest_path}")
-          PY
+          echo "=== startup preload records ==="
+          grep -o 'y7:preloadt' "$ROOT/manifest/startup.json" | wc -l || true
 
       - name: Verify HTML5 output
         shell: bash
@@ -173,16 +159,17 @@ jobs:
           test -f "$ROOT/index.html"
           test -s "$ROOT/index.html"
 
-          test -f "$ROOT/manifest/game.json"
-          ! grep -q 'y7:preloadt' "$ROOT/manifest/game.json"
-          ! grep -q 'y7:preloadf' "$ROOT/manifest/game.json"
+          # startup.json must exist before the game is launched; it must not
+          # contain any preload=true entries that would block FlxPreloader.
+          test -f "$ROOT/manifest/startup.json"
+          ! grep -q 'y7:preloadt' "$ROOT/manifest/startup.json"
 
           touch "$ROOT/.nojekyll"
 
           echo "=== HTML5 output ==="
           find "$ROOT" -maxdepth 3 -type f -print | sort | head -200
 
-          echo "Verified: $ROOT/index.html"
+          echo "Verified HTML5 output and startup manifest."
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
