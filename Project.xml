@@ -42,8 +42,9 @@
 
 	<!-- Keep the game assets in a lazy library on HTML5. -->
 	<library name="game" preload="false" if="web"/>
+	<library name="fonts" preload="false" if="web"/>
 
-	<assets path="assets/preload" rename="assets" library="game" exclude="*.mp3|*.webm|*.DS_Store" embed="false" preload="false" if="web"/>
+	<assets path="assets/preload" rename="assets" library="game" exclude="*.mp3|*.webm|*.DS_Store|*.ttf|*.otf" embed="false" preload="false" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 	
 	<!-- <define name="PRELOAD_ALL" /> -->
@@ -77,7 +78,7 @@
 		THEN UHHH I USED THE NAME OF THE FONT WITH SETFORMAT() ON THE TEXT!!!
 		NOT USING A DIRECT THING TO THE ASSET!!!
 	-->
-	<assets path="assets/fonts" rename="assets/fonts" library="game" embed="false" preload="false" if="web"/>
+	<assets path="assets/fonts" rename="assets/fonts" library="fonts" embed="false" preload="false" if="web"/>
 	<assets path="assets/fonts" embed="true" unless="web"/>
 	<!-- _______________________________ Libraries ______________________________ -->
 
