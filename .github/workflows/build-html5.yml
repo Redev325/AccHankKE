@@ -89,6 +89,7 @@ jobs:
           import json
           import sys
           from pathlib import Path
+          from urllib.parse import unquote
 
           root = Path(sys.argv[1])
 
@@ -98,7 +99,10 @@ jobs:
               assets = data.get("assets", "")
               if not isinstance(assets, str):
                   raise SystemExit(f"{name}.json has unexpected assets format")
-              return data, assets
+              # Lime 7.9's Haxe serializer URL-escapes strings such as
+              # assets/images/... as assets%2Fimages%2F..., so decode before
+              # checking which asset tree each library actually owns.
+              return data, unquote(assets)
 
           _, default_assets = read_manifest("default")
           _, startup_assets = read_manifest("startup")
