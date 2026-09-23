@@ -127,6 +127,42 @@ jobs:
           set -e
           haxelib run lime build html5
 
+      - name: Remove generated HTML5 asset preloads
+        shell: bash
+        run: |
+          set -e
+          ROOT="export/release/html5/bin"
+          MANIFEST="$ROOT/manifest/game.json"
+
+          test -f "$MANIFEST"
+
+          python3 - "$MANIFEST" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          manifest_path = Path(sys.argv[1])
+          manifest = json.loads(manifest_path.read_text())
+          assets = manifest.get("assets")
+
+          if not isinstance(assets, str):
+              raise SystemExit("manifest/game.json has an unexpected assets format")
+
+          # Lime/OpenFL stores the version-2 asset list as a Haxe-serialized
+          # string. The generated web manifest can mark some fonts as preload
+          # even though Project.xml requests lazy web assets. A single stuck
+          # font preload prevents Assets.loadLibrary("game") from completing.
+          assets = assets.replace("y7:preloadt", "").replace("y7:preloadf", "")
+          manifest["assets"] = assets
+
+          manifest_path.write_text(json.dumps(manifest, separators=(",", ":")))
+
+          if "y7:preloadt" in assets or "y7:preloadf" in assets:
+              raise SystemExit("Generated game manifest still contains preload flags")
+
+          print(f"Sanitized {manifest_path}")
+          PY
+
       - name: Verify HTML5 output
         shell: bash
         run: |
@@ -136,6 +172,10 @@ jobs:
           test -d "$ROOT"
           test -f "$ROOT/index.html"
           test -s "$ROOT/index.html"
+
+          test -f "$ROOT/manifest/game.json"
+          ! grep -q 'y7:preloadt' "$ROOT/manifest/game.json"
+          ! grep -q 'y7:preloadf' "$ROOT/manifest/game.json"
 
           touch "$ROOT/.nojekyll"
 
