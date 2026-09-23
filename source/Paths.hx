@@ -37,17 +37,27 @@ class Paths
 
 	static public function getLibraryPath(file:String, library = "preload")
 	{
-		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
+		#if web
+		if (library == "preload" || library == "default")
+			return getLibraryPathForce(file, "startup");
+		#end
+
+		return if (library == "preload" || library == "default") getPreloadPath(file) else getLibraryPathForce(file, library);
 	}
 
 	inline static function getLibraryPathForce(file:String, library:String)
 	{
+		#if web
+		if (library == "startup")
+			return 'startup:assets/$file';
+		#end
+
 		return '$library:assets/$library/$file';
 	}
 
 	inline static function getPreloadPath(file:String)
 	{
-		return 'assets/$file';
+		return #if web 'startup:assets/$file' #else 'assets/$file' #end;
 	}
 
 	inline static public function file(file:String, type:AssetType = TEXT, ?library:String)
@@ -65,7 +75,7 @@ class Paths
 		return getPath('data/$key.png', IMAGE, library);
 	}
 
-	inline static public function txt(key:String, ?library:String)
+	inline static public function txt(key:String,?library:String)
 	{
 		return getPath('data/$key.txt', TEXT, library);
 	}
@@ -122,7 +132,7 @@ class Paths
 
 	inline static public function font(key:String)
 	{
-		return 'assets/fonts/$key';
+		return #if web 'startup:assets/fonts/$key' #else 'assets/fonts/$key' #end;
 	}
 
 	inline static public function getSparrowAtlas(key:String, ?library:String)

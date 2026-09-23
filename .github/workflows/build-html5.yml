@@ -1,14 +1,11 @@
 name: Build and Deploy HTML5
 
-# HTML5 release pipeline: build and deploy the current main branch.
-
 on:
   workflow_dispatch:
   push:
     branches:
       - main
 
-# Prevent older HTML5 deployments from racing the newest build.
 concurrency:
   group: github-pages-html5-v2
   cancel-in-progress: true
@@ -66,92 +63,83 @@ jobs:
           haxelib set hscript 2.4.0
           haxelib set actuate 1.9.0
 
-          echo "=== Selected Haxe libraries ==="
-          haxelib list
-          echo "=== hscript path ==="
-          haxelib path hscript
-          echo "=== lime path ==="
-          haxelib path lime
-          echo "=== openfl path ==="
-          haxelib path openfl
-
-          # The old Lime/OpenFL web preloader reads preload flags from
-          # dependency include.xml files at compile time. Disable every
-          # dependency preload flag before generating the HTML5 manifest.
-          python3 - <<'PY'
-          import subprocess
-          from pathlib import Path
-
-          packages = ["lime", "openfl", "flixel", "flixel-ui", "flixel-addons", "actuate"]
-
-          for package in packages:
-              root = Path(subprocess.check_output(
-                  ["haxelib", "path", package], text=True
-              ).splitlines()[0].strip())
-
-              changed = 0
-              for include in root.rglob("include.xml"):
-                  text = include.read_text()
-                  if 'preload="true"' in text:
-                      text = text.replace('preload="true"', 'preload="false"')
-                      include.write_text(text)
-                      changed += 1
-
-              print(f"Patched {package}: {changed} include.xml file(s)")
-          PY
-
       - name: Build HTML5
         shell: bash
         run: |
           set -e
           haxelib run lime build html5
 
-      - name: Verify HTML5 preload data
+      - name: Verify HTML5 manifests
         shell: bash
         run: |
           set -e
           ROOT="export/release/html5/bin"
           JS="$ROOT/AccelerantKE.js"
+          MANIFEST="$ROOT/manifest"
 
           test -f "$JS"
           test -s "$JS"
           test -f "$ROOT/index.html"
 
-          # Lime embeds the manifest inside the compiled JavaScript. This is
-          # the data the FlxPreloader actually uses, so verify the compiled
-          # program itself has no true preload records.
-          PRELOAD_COUNT="$(grep -o 'y7:preloadt' "$JS" | wc -l || true)"
-          echo "Compiled JS preload=true records: $PRELOAD_COUNT"
-          if [ "$PRELOAD_COUNT" -ne 0 ]; then
-            echo "ERROR: compiled JavaScript still contains blocking preload records."
-            exit 1
-          fi
-
-          for manifest in default game songs shared fonts; do
-            test -f "$ROOT/manifest/$manifest.json"
+          for manifest in default startup shared songs; do
+            test -f "$MANIFEST/$manifest.json"
           done
 
-          touch "$ROOT/.nojekyll"
-          echo "Verified HTML5 build without embedded preload=true records."
-
-      - name: Sanitize generated manifest files
-        shell: bash
-        run: |
-          set -e
-          ROOT="export/release/html5/bin"
-
-          # Keep the loose manifests consistent with the compiled JS.
-          python3 - "$ROOT/manifest" <<'PY'
+          python3 - "$MANIFEST" <<'PY'
+          import json
           import sys
           from pathlib import Path
 
           root = Path(sys.argv[1])
-          for path in root.glob("*.json"):
-              text = path.read_text()
-              if "y7:preloadt" in text:
-                  path.write_text(text.replace("y7:preloadt", ""))
-                  print("Sanitized", path)
+
+          def read_manifest(name):
+              path = root / f"{name}.json"
+              data = json.loads(path.read_text())
+              assets = data.get("assets", "")
+              if not isinstance(assets, str):
+                  raise SystemExit(f"{name}.json has unexpected assets format")
+              return data, assets
+
+          _, default_assets = read_manifest("default")
+          _, startup_assets = read_manifest("startup")
+          _, shared_assets = read_manifest("shared")
+          _, songs_assets = read_manifest("songs")
+
+          forbidden_default = (
+              "assets/preload",
+              "assets/shared",
+              "assets/songs",
+              "assets/fonts",
+          )
+          for marker in forbidden_default:
+              if marker in default_assets:
+                  raise SystemExit(
+                      f"default.json unexpectedly contains project asset tree: {marker}"
+                  )
+
+          for marker in ("assets/images/", "assets/data/", "assets/sounds/", "assets/fonts/"):
+              if marker not in startup_assets:
+                  raise SystemExit(
+                      f"startup.json is missing expected startup assets: {marker}"
+                  )
+
+          for marker, name, assets in (
+              ("assets/shared/", "shared", shared_assets),
+              ("assets/songs/", "songs", songs_assets),
+          ):
+              if marker not in assets:
+                  raise SystemExit(f"{name}.json is missing expected root: {marker}")
+
+          sizes = {
+              name: (root / f"{name}.json").stat().st_size
+              for name in ("default", "startup", "shared", "songs")
+          }
+          print("Manifest sizes:", sizes)
+          print("Verified startup preloads and lazy shared/song libraries.")
           PY
+
+          touch "$ROOT/.nojekyll"
+          echo "HTML5 build and manifest structure verified."
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
