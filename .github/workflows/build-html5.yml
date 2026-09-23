@@ -69,6 +69,34 @@ jobs:
           set -e
           haxelib run lime build html5
 
+      - name: Cache-bust generated HTML5 JavaScript
+        shell: bash
+        run: |
+          set -e
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          import re
+
+          path = Path("export/release/html5/bin/index.html")
+          html = path.read_text(encoding="utf-8")
+          sha = os.environ.get("GITHUB_SHA", "")[:12]
+          if not sha:
+              raise SystemExit("GITHUB_SHA is unavailable")
+
+          html, count = re.subn(
+              r'AccelerantKE\.js(?:\?[^"\']*)?',
+              f'AccelerantKE.js?v={sha}',
+              html,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("Could not find AccelerantKE.js in generated index.html")
+
+          path.write_text(html, encoding="utf-8")
+          print(f"Cache-busted AccelerantKE.js with v={sha}")
+          PY
+
       - name: Add HTML5 runtime error overlay
         shell: bash
         run: |
