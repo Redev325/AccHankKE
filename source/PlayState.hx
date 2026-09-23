@@ -2248,7 +2248,9 @@ class PlayState extends MusicBeatState
 						daNote.x = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].x;
 						if (!daNote.isSustainNote)
 							daNote.angle = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].angle;
-						daNote.alpha = 1;
+						// In Middle Scroll the opponent's moving notes are translucent,
+						// while the player's moving notes remain fully visible.
+						daNote.alpha = PlayStateChangeables.useMiddleScroll ? 0.35 : 1;
 					}
 					
 					
