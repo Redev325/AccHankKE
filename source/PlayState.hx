@@ -1297,7 +1297,10 @@ class PlayState extends MusicBeatState
 
 			babyArrow.y -= 10;
 			babyArrow.alpha = 0;
-			FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: 0.8}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+			var receptorAlpha:Float = 0.8;
+			if (PlayStateChangeables.useMiddleScroll && !PlayStateChangeables.Optimize && player == 0)
+				receptorAlpha = 1;
+			FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: receptorAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
 
 			babyArrow.ID = i;
 
@@ -1323,14 +1326,21 @@ class PlayState extends MusicBeatState
 				babyArrow.x -= 275;
 
 			// Middle Scroll based on the supplied concept:
-			// center the opponent's four arrows and keep the player's four
-			// arrows on the right side of the playfield.
+			// the player's four arrows stay centered while the opponent's
+			// four arrows are pushed out to the far left/right sides.
 			if (PlayStateChangeables.useMiddleScroll && !PlayStateChangeables.Optimize)
 			{
 				var middleGroupWidth:Float = Note.swagWidth * 4;
-				var middleOpponentStart:Float = (FlxG.width - middleGroupWidth) / 2;
-				var middlePlayerStart:Float = FlxG.width - middleGroupWidth - 25;
-				babyArrow.x = (player == 0 ? middleOpponentStart : middlePlayerStart) + Note.swagWidth * i;
+				var middlePlayerStart:Float = (FlxG.width - middleGroupWidth) / 2;
+				babyArrow.x = middlePlayerStart + Note.swagWidth * i;
+				
+				if (player == 0)
+				{
+					if (i < 2)
+						babyArrow.x = 25 + Note.swagWidth * i;
+					else
+						babyArrow.x = FlxG.width - (Note.swagWidth * 2) - 25 + Note.swagWidth * (i - 2);
+				}
 			}
 			
 			cpuStrums.forEach(function(spr:FlxSprite)
