@@ -71,8 +71,6 @@ class TitleState extends MusicBeatState
 		FlxG.save.data.userLevel = null;
 		FlxG.save.data.userRank = null;
 
-		PlayerSettings.init();
-
 		#if windows
 		DiscordClient.initialize();
 
