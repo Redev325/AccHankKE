@@ -13,19 +13,19 @@ class WebBootState extends FlxState
     {
         super.create();
 
-        var status = new FlxText(0, FlxG.height / 2 - 20, FlxG.width, "Loading game...", 24);
+        var status = new FlxText(0, FlxG.height / 2 - 20, FlxG.width, "Loading title...", 24);
         status.alignment = CENTER;
         status.color = FlxColor.WHITE;
         add(status);
 
-        Assets.loadLibrary("game").onComplete(function(_)
+        Assets.loadLibrary("startup").onComplete(function(_)
         {
             FlxG.switchState(new TitleState());
         });
 
-        Assets.loadLibrary("game").onError(function(error)
+        Assets.loadLibrary("startup").onError(function(error)
         {
-            status.text = "Game asset loading failed. Check the browser console.";
+            status.text = "Startup asset loading failed. Check the browser console.";
             trace(error);
         });
     }
