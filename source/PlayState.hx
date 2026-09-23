@@ -325,6 +325,7 @@ class PlayState extends MusicBeatState
 
 
 		PlayStateChangeables.useDownscroll = FlxG.save.data.downscroll;
+		PlayStateChangeables.useMiddleScroll = FlxG.save.data.middleScroll;
 		PlayStateChangeables.safeFrames = FlxG.save.data.frames;
 		PlayStateChangeables.scrollSpeed = FlxG.save.data.scrollSpeed;
 		PlayStateChangeables.botPlay = FlxG.save.data.botplay;
@@ -1320,6 +1321,17 @@ class PlayState extends MusicBeatState
 			
 			if (PlayStateChangeables.Optimize)
 				babyArrow.x -= 275;
+
+			// Middle Scroll based on the supplied concept:
+			// center the opponent's four arrows and keep the player's four
+			// arrows on the right side of the playfield.
+			if (PlayStateChangeables.useMiddleScroll && !PlayStateChangeables.Optimize)
+			{
+				var middleGroupWidth:Float = Note.swagWidth * 4;
+				var middleOpponentStart:Float = (FlxG.width - middleGroupWidth) / 2;
+				var middlePlayerStart:Float = FlxG.width - middleGroupWidth - 25;
+				babyArrow.x = (player == 0 ? middleOpponentStart : middlePlayerStart) + Note.swagWidth * i;
+			}
 			
 			cpuStrums.forEach(function(spr:FlxSprite)
 			{					
