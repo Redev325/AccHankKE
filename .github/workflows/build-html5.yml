@@ -69,6 +69,69 @@ jobs:
           set -e
           haxelib run lime build html5
 
+      - name: Add HTML5 runtime error overlay
+        shell: bash
+        run: |
+          set -e
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("export/release/html5/bin/index.html")
+          html = path.read_text(encoding="utf-8")
+
+          overlay = r"""<script>
+          (function () {
+            function showError(message, source, line, column, error) {
+              var existing = document.getElementById("__html5_runtime_error");
+              if (!existing) {
+                existing = document.createElement("pre");
+                existing.id = "__html5_runtime_error";
+                existing.style.cssText =
+                  "position:fixed;z-index:2147483647;left:0;top:0;right:0;bottom:0;" +
+                  "margin:0;padding:24px;box-sizing:border-box;background:#120000;" +
+                  "color:#ff6b6b;font:16px/1.45 monospace;white-space:pre-wrap;" +
+                  "overflow:auto;";
+                document.body.appendChild(existing);
+              }
+              var text = "HTML5 runtime error\\n\\n" + String(message || "Unknown error");
+              if (source) text += "\\n\\nSource: " + source + ":" + line + ":" + column;
+              if (error && error.stack) text += "\\n\\nStack:\\n" + error.stack;
+              existing.textContent = text;
+            }
+
+            window.addEventListener("error", function (event) {
+              showError(
+                event.message,
+                event.filename,
+                event.lineno,
+                event.colno,
+                event.error
+              );
+            });
+
+            window.addEventListener("unhandledrejection", function (event) {
+              var reason = event.reason;
+              showError(
+                reason && reason.message ? reason.message : String(reason),
+                "",
+                0,
+                0,
+                reason
+              );
+            });
+          })();
+          </script>
+          """
+
+          if "</head>" not in html:
+            raise SystemExit("index.html has no </head> marker")
+
+          if "__html5_runtime_error" not in html:
+            html = html.replace("</head>", overlay + "</head>", 1)
+
+          path.write_text(html, encoding="utf-8")
+          PY
+
       - name: Verify HTML5 manifests
         shell: bash
         run: |
