@@ -47,7 +47,7 @@ class Paths
 
 	inline static function getPreloadPath(file:String)
 	{
-		return #if web 'game:assets/$file' #else 'assets/$file' #end;
+		return 'assets/$file';
 	}
 
 	inline static public function file(file:String, type:AssetType = TEXT, ?library:String)
@@ -122,7 +122,7 @@ class Paths
 
 	inline static public function font(key:String)
 	{
-		return #if web 'fonts:assets/fonts/$key' #else 'assets/fonts/$key' #end;
+		return 'assets/fonts/$key';
 	}
 
 	inline static public function getSparrowAtlas(key:String, ?library:String)
