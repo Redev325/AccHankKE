@@ -59,8 +59,6 @@
 	<assets path="assets/preload/images/logo.png" rename="assets/images/logo.png" library="startup" if="web" embed="false" preload="false"/>
 	<assets path="assets/preload/images/newgrounds_logo.png" rename="assets/images/newgrounds_logo.png" library="startup" if="web" embed="false" preload="false"/>
 	<assets path="assets/preload/data/introText.txt" rename="assets/data/introText.txt" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/music/freakyMenu.ogg" rename="assets/music/freakyMenu.ogg" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/sounds/confirmMenu.ogg" rename="assets/sounds/confirmMenu.ogg" library="startup" if="web" embed="false" preload="false"/>
 	<assets path="assets/preload" rename="assets" library="game" exclude="*.mp3|*.webm|*.DS_Store|*.ttf|*.otf" embed="false" preload="false" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 	
