@@ -325,9 +325,12 @@ class TitleState extends MusicBeatState
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
 				#if web
-				Assets.loadLibrary("shared").onComplete(function(_)
+				Assets.loadLibrary("fonts").onComplete(function(_)
 				{
-					FlxG.switchState(new SaveKeybinds());
+					Assets.loadLibrary("shared").onComplete(function(_)
+					{
+						FlxG.switchState(new SaveKeybinds());
+					});
 				});
 				#else
 				FlxG.switchState(new SaveKeybinds());
