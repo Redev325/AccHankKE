@@ -60,6 +60,8 @@ class TitleState extends MusicBeatState
 		// Bind and initialize the save before touching save.data. MusicBeatState.create()
 		// also reads fpsCap, so this must happen before super.create().
 		FlxG.save.bind('accelerantke', 'gamingbottomtext');
+		// Populate keybind defaults before Controls.loadKeyBinds() runs during PlayerSettings.init().
+		KeyBinds.keyCheck();
 		PlayerSettings.init();
 		KadeEngineData.initSave();
 
