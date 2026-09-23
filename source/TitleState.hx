@@ -376,6 +376,14 @@ class TitleState extends MusicBeatState
 	{
 		super.beatHit();
 
+		// TitleState can receive a beat while returning from another state,
+		// before the delayed startIntro() has created its title sprites.
+		if (logoBl == null || gfDance == null)
+			return;
+
+		if (logoBl.animation.getByName('bump') == null || gfDance.animation.getByName('danceLeft') == null)
+			return;
+
 		logoBl.animation.play('bump');
 		danceLeft = !danceLeft;
 
