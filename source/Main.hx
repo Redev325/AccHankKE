@@ -93,7 +93,11 @@ class Main extends Sprite
 		#if !mobile
 		fpsCounter = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsCounter);
+		#if web
+		fpsCounter.visible = false;
+		#else
 		toggleFPS(FlxG.save.data.fps);
+		#end
 
 		#end
 		//memory.name = getMemory();
