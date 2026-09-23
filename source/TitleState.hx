@@ -57,6 +57,9 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
+		// Bind and initialize the save before touching save.data. MusicBeatState.create()
+		// also reads fpsCap, so this must happen before super.create().
+
 		#if sys
 		if (!sys.FileSystem.exists(Sys.getCwd() + "/assets/replays"))
 			sys.FileSystem.createDirectory(Sys.getCwd() + "/assets/replays");
