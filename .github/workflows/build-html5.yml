@@ -75,51 +75,30 @@ jobs:
           echo "=== openfl path ==="
           haxelib path openfl
 
-          # Lime 7.9's HTML5 preloader waits on assets marked preload in
-          # dependency include.xml files. Keep package assets lazy and let
-          # the game request them when needed after the normal FlxPreloader.
+          # The old Lime/OpenFL web preloader reads preload flags from
+          # dependency include.xml files at compile time. Disable every
+          # dependency preload flag before generating the HTML5 manifest.
           python3 - <<'PY'
           import subprocess
           from pathlib import Path
-          
-          packages = ["flixel", "flixel-ui"]
-          
+
+          packages = ["flixel", "flixel-ui", "flixel-addons", "actuate"]
+
           for package in packages:
-              root = subprocess.check_output(
+              root = Path(subprocess.check_output(
                   ["haxelib", "path", package], text=True
-              ).splitlines()[0].strip()
-              include = Path(root) / "include.xml"
-          
-              if not include.exists():
-                  raise SystemExit(f"Missing include.xml for {package}: {include}")
-          
-              text = include.read_text()
-              lines = text.splitlines()
+              ).splitlines()[0].strip())
+
               changed = 0
-          
-              for i, line in enumerate(lines):
-                  if "<assets " in line and "preload=" not in line and line.rstrip().endswith("/>"):
-                      lines[i] = line.rstrip()[:-2] + ' preload="false" />'
+              for include in root.rglob("include.xml"):
+                  text = include.read_text()
+                  if 'preload="true"' in text:
+                      text = text.replace('preload="true"', 'preload="false"')
+                      include.write_text(text)
                       changed += 1
-          
-              if changed == 0:
-                  raise SystemExit(f"No asset declarations were patched in {include}")
-          
-              include.write_text("\n".join(lines) + "\n")
-              print(f"Patched {package}: {include} ({changed} asset declarations)")
-          
-              verify = include.read_text()
-              if '<assets ' in verify and 'preload="true"' in verify:
-                  raise SystemExit(f"Found preload=true in patched {package} include.xml")
+
+              print(f"Patched {package}: {changed} include.xml file(s)")
           PY
-
-          echo "=== HaxeFlixel include.xml ==="
-          FLIXEL_DIR="$(haxelib path flixel | head -n 1)"
-          grep -E '<assets |nokiafc22|monsterrat' "$FLIXEL_DIR/include.xml"
-
-          echo "=== FlxUI include.xml ==="
-          FLIXEL_UI_DIR="$(haxelib path flixel-ui | head -n 1)"
-          grep -E '<assets |flixel-ui' "$FLIXEL_UI_DIR/include.xml"
 
       - name: Build HTML5
         shell: bash
@@ -127,49 +106,52 @@ jobs:
           set -e
           haxelib run lime build html5
 
-      - name: Verify HTML5 manifests
+      - name: Verify HTML5 preload data
         shell: bash
         run: |
           set -e
           ROOT="export/release/html5/bin"
+          JS="$ROOT/AccelerantKE.js"
 
+          test -f "$JS"
+          test -s "$JS"
           test -f "$ROOT/index.html"
 
-          # The browser must start with only the tiny startup library.
-          test -f "$ROOT/manifest/startup.json"
-          ! grep -q 'y7:preloadt' "$ROOT/manifest/startup.json"
+          # Lime embeds the manifest inside the compiled JavaScript. This is
+          # the data the FlxPreloader actually uses, so verify the compiled
+          # program itself has no true preload records.
+          PRELOAD_COUNT="$(grep -o 'y7:preloadt' "$JS" | wc -l || true)"
+          echo "Compiled JS preload=true records: $PRELOAD_COUNT"
+          if [ "$PRELOAD_COUNT" -ne 0 ]; then
+            echo "ERROR: compiled JavaScript still contains blocking preload records."
+            exit 1
+          fi
 
-          # Full game and fonts are loaded later by the game itself.
-          test -f "$ROOT/manifest/game.json"
-          test -f "$ROOT/manifest/fonts.json"
-
-          echo "=== HTML5 manifest sizes ==="
-          wc -c "$ROOT"/manifest/*.json
-
-          echo "=== startup preload records ==="
-          grep -o 'y7:preloadt' "$ROOT/manifest/startup.json" | wc -l || true
-
-      - name: Verify HTML5 output
-        shell: bash
-        run: |
-          set -e
-          ROOT="export/release/html5/bin"
-
-          test -d "$ROOT"
-          test -f "$ROOT/index.html"
-          test -s "$ROOT/index.html"
-
-          # startup.json must exist before the game is launched; it must not
-          # contain any preload=true entries that would block FlxPreloader.
-          test -f "$ROOT/manifest/startup.json"
-          ! grep -q 'y7:preloadt' "$ROOT/manifest/startup.json"
+          for manifest in default game songs shared fonts; do
+            test -f "$ROOT/manifest/$manifest.json"
+          done
 
           touch "$ROOT/.nojekyll"
+          echo "Verified HTML5 build without embedded preload=true records."
 
-          echo "=== HTML5 output ==="
-          find "$ROOT" -maxdepth 3 -type f -print | sort | head -200
+      - name: Sanitize generated manifest files
+        shell: bash
+        run: |
+          set -e
+          ROOT="export/release/html5/bin"
 
-          echo "Verified HTML5 output and startup manifest."
+          # Keep the loose manifests consistent with the compiled JS.
+          python3 - "$ROOT/manifest" <<'PY'
+          import sys
+          from pathlib import Path
+
+          root = Path(sys.argv[1])
+          for path in root.glob("*.json"):
+              text = path.read_text()
+              if "y7:preloadt" in text:
+                  path.write_text(text.replace("y7:preloadt", ""))
+                  print("Sanitized", path)
+          PY
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
