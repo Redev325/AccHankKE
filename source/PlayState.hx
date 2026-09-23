@@ -965,7 +965,7 @@ class PlayState extends MusicBeatState
 
 		// Browser/OS modifier keys such as Alt are not gameplay binds.
 		// Ignore them instead of trying to call toLowerCase() on a missing key name.
-		if (key == null || evt.keyCode == Keyboard.ALT)
+		if (key == null || evt.keyCode == 18)
 			return;
 	
 		var binds:Array<String> = [FlxG.save.data.leftBind,FlxG.save.data.downBind, FlxG.save.data.upBind, FlxG.save.data.rightBind];
