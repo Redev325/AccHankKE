@@ -122,7 +122,7 @@ class Paths
 
 	inline static public function font(key:String)
 	{
-		return #if web 'game:assets/fonts/$key' #else 'assets/fonts/$key' #end;
+		return #if web 'fonts:assets/fonts/$key' #else 'assets/fonts/$key' #end;
 	}
 
 	inline static public function getSparrowAtlas(key:String, ?library:String)
