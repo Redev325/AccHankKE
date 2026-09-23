@@ -962,6 +962,11 @@ class PlayState extends MusicBeatState
 
 		@:privateAccess
 		var key = FlxKey.toStringMap.get(Keyboard.__convertKeyCode(evt.keyCode));
+
+		// Browser/OS modifier keys such as Alt are not gameplay binds.
+		// Ignore them instead of trying to call toLowerCase() on a missing key name.
+		if (key == null || evt.keyCode == Keyboard.ALT)
+			return;
 	
 		var binds:Array<String> = [FlxG.save.data.leftBind,FlxG.save.data.downBind, FlxG.save.data.upBind, FlxG.save.data.rightBind];
 
@@ -981,7 +986,7 @@ class PlayState extends MusicBeatState
 
 		for (i in 0...binds.length) // binds
 		{
-			if (binds[i].toLowerCase() == key.toLowerCase())
+			if (binds[i] != null && binds[i].toLowerCase() == key.toLowerCase())
 				data = i;
 		}
 
@@ -2145,7 +2150,7 @@ class PlayState extends MusicBeatState
 								Speakers.visible = true;
 								if (FlxG.random.bool(20) && !spookyRendered && !daNote.isSustainNote) // create spooky text :flushed:
 									{
-										createSpookyText(TrickyLinesSing[FlxG.random.int(0,TrickyLinesSing.length)], tiky.x, tiky.y);
+										createSpookyText(randomTrickyLine(TrickyLinesSing), tiky.x, tiky.y);
 									}
 							} 
 							else if (curStep > 734 && curStep < 864){
@@ -2159,7 +2164,7 @@ class PlayState extends MusicBeatState
 								    tiky.holdTimer = 0;
 									if (FlxG.random.bool(20) && !spookyRendered && !daNote.isSustainNote) // create spooky text :flushed:
 										{
-											createSpookyText(TrickyLinesSing[FlxG.random.int(0,TrickyLinesSing.length)], tiky.x, tiky.y);
+											createSpookyText(randomTrickyLine(TrickyLinesSing), tiky.x, tiky.y);
 										}
 								}// yanderedev type shit
 							else 
@@ -3573,6 +3578,13 @@ class PlayState extends MusicBeatState
 	 * @param x dax (dont change)
 	 * @param y day (dont change too)
 	 */
+	private function randomTrickyLine(lines:Array<String>):String
+	{
+		if (lines == null || lines.length == 0)
+			return '';
+		return lines[FlxG.random.int(0, lines.length - 1)];
+	}
+
 	function createSpookyText(text:String, x:Float = 0, y:Float = 0):Void
 	{
 		spookySteps = curStep;
@@ -3719,7 +3731,7 @@ class PlayState extends MusicBeatState
 				if (storyDifficulty == 3) {
 					if (FlxG.random.bool(15)) {
 						if (!spookyRendered) {
-							createSpookyText(TrickyHLines[FlxG.random.int(0,TrickyHLines.length)]);
+							createSpookyText(randomTrickyLine(TrickyHLines));
 						}
 					}
 				}
