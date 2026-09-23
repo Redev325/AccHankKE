@@ -46,21 +46,21 @@
 	<library name="fonts" preload="false" if="web"/>
 
 	<!-- Only the assets directly touched while constructing TitleState are loaded at startup. -->
-	<assets path="assets/preload/images/KadeEngineLogoBumpin.png" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/KadeEngineLogoBumpin.xml" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/logoBumpin.png" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/logoBumpin.xml" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/gfDanceTitle.png" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/gfDanceTitle.xml" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/titleEnter.png" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/titleEnter.xml" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/alphabet.png" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/alphabet.xml" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/logo.png" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/images/newgrounds_logo.png" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/data/introText.txt" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/music/freakyMenu.ogg" library="startup" if="web" embed="false" preload="false"/>
-	<assets path="assets/preload/sounds/confirmMenu.ogg" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/KadeEngineLogoBumpin.png" rename="assets/images/KadeEngineLogoBumpin.png" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/KadeEngineLogoBumpin.xml" rename="assets/images/KadeEngineLogoBumpin.xml" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/logoBumpin.png" rename="assets/images/logoBumpin.png" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/logoBumpin.xml" rename="assets/images/logoBumpin.xml" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/gfDanceTitle.png" rename="assets/images/gfDanceTitle.png" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/gfDanceTitle.xml" rename="assets/images/gfDanceTitle.xml" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/titleEnter.png" rename="assets/images/titleEnter.png" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/titleEnter.xml" rename="assets/images/titleEnter.xml" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/alphabet.png" rename="assets/images/alphabet.png" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/alphabet.xml" rename="assets/images/alphabet.xml" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/logo.png" rename="assets/images/logo.png" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/images/newgrounds_logo.png" rename="assets/images/newgrounds_logo.png" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/data/introText.txt" rename="assets/data/introText.txt" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/music/freakyMenu.ogg" rename="assets/music/freakyMenu.ogg" library="startup" if="web" embed="false" preload="false"/>
+	<assets path="assets/preload/sounds/confirmMenu.ogg" rename="assets/sounds/confirmMenu.ogg" library="startup" if="web" embed="false" preload="false"/>
 	<assets path="assets/preload" rename="assets" library="game" exclude="*.mp3|*.webm|*.DS_Store|*.ttf|*.otf" embed="false" preload="false" if="web"/>
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 	
