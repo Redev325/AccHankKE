@@ -568,34 +568,63 @@ class Controls extends FlxActionSet
 
 	public function loadKeyBinds()
 	{
-
-		//trace(FlxKey.fromString(FlxG.save.data.upBind));
-
+		// Controls can be constructed before the save defaults have been initialized.
+		// Always normalize every saved binding to a real string before the HaxeFlixel
+		// key/button parsers call toUpperCase() on it.
 		removeKeyboard();
 		if (gamepadsAdded.length != 0)
 			removeGamepad();
 		KeyBinds.keyCheck();
 
-		var buttons = new Map<Control,Array<FlxGamepadInputID>>();
+		var upBind:String = FlxG.save.data.upBind;
+		var downBind:String = FlxG.save.data.downBind;
+		var leftBind:String = FlxG.save.data.leftBind;
+		var rightBind:String = FlxG.save.data.rightBind;
+		var killBind:String = FlxG.save.data.killBind;
+		var gpupBind:String = FlxG.save.data.gpupBind;
+		var gpdownBind:String = FlxG.save.data.gpdownBind;
+		var gpleftBind:String = FlxG.save.data.gpleftBind;
+		var gprightBind:String = FlxG.save.data.gprightBind;
 
-		buttons.set(Control.UP,[FlxGamepadInputID.fromString(FlxG.save.data.gpupBind)]);
-		buttons.set(Control.LEFT,[FlxGamepadInputID.fromString(FlxG.save.data.gpleftBind)]);
-		buttons.set(Control.DOWN,[FlxGamepadInputID.fromString(FlxG.save.data.gpdownBind)]);
-		buttons.set(Control.RIGHT,[FlxGamepadInputID.fromString(FlxG.save.data.gprightBind)]);
+		if (upBind == null || upBind.length == 0) upBind = "W";
+		if (downBind == null || downBind.length == 0) downBind = "S";
+		if (leftBind == null || leftBind.length == 0) leftBind = "A";
+		if (rightBind == null || rightBind.length == 0) rightBind = "D";
+		if (killBind == null || killBind.length == 0) killBind = "R";
+		if (gpupBind == null || gpupBind.length == 0) gpupBind = "DPAD_UP";
+		if (gpdownBind == null || gpdownBind.length == 0) gpdownBind = "DPAD_DOWN";
+		if (gpleftBind == null || gpleftBind.length == 0) gpleftBind = "DPAD_LEFT";
+		if (gprightBind == null || gprightBind.length == 0) gprightBind = "DPAD_RIGHT";
+
+		FlxG.save.data.upBind = upBind;
+		FlxG.save.data.downBind = downBind;
+		FlxG.save.data.leftBind = leftBind;
+		FlxG.save.data.rightBind = rightBind;
+		FlxG.save.data.killBind = killBind;
+		FlxG.save.data.gpupBind = gpupBind;
+		FlxG.save.data.gpdownBind = gpdownBind;
+		FlxG.save.data.gpleftBind = gpleftBind;
+		FlxG.save.data.gprightBind = gprightBind;
+
+		var buttons = new Map<Control,Array<FlxGamepadInputID>>();
+		buttons.set(Control.UP,[FlxGamepadInputID.fromString(gpupBind)]);
+		buttons.set(Control.LEFT,[FlxGamepadInputID.fromString(gpleftBind)]);
+		buttons.set(Control.DOWN,[FlxGamepadInputID.fromString(gpdownBind)]);
+		buttons.set(Control.RIGHT,[FlxGamepadInputID.fromString(gprightBind)]);
 		buttons.set(Control.ACCEPT,[FlxGamepadInputID.A]);
 		buttons.set(Control.BACK,[FlxGamepadInputID.B]);
 		buttons.set(Control.PAUSE,[FlxGamepadInputID.START]);
 
 		addGamepad(0,buttons);
 
-		inline bindKeys(Control.UP, [FlxKey.fromString(FlxG.save.data.upBind), FlxKey.UP]);
-		inline bindKeys(Control.DOWN, [FlxKey.fromString(FlxG.save.data.downBind), FlxKey.DOWN]);
-		inline bindKeys(Control.LEFT, [FlxKey.fromString(FlxG.save.data.leftBind), FlxKey.LEFT]);
-		inline bindKeys(Control.RIGHT, [FlxKey.fromString(FlxG.save.data.rightBind), FlxKey.RIGHT]);
+		inline bindKeys(Control.UP, [FlxKey.fromString(upBind), FlxKey.UP]);
+		inline bindKeys(Control.DOWN, [FlxKey.fromString(downBind), FlxKey.DOWN]);
+		inline bindKeys(Control.LEFT, [FlxKey.fromString(leftBind), FlxKey.LEFT]);
+		inline bindKeys(Control.RIGHT, [FlxKey.fromString(rightBind), FlxKey.RIGHT]);
 		inline bindKeys(Control.ACCEPT, [Z, SPACE, ENTER]);
 		inline bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
 		inline bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
-		inline bindKeys(Control.RESET, [FlxKey.fromString(FlxG.save.data.killBind)]);
+		inline bindKeys(Control.RESET, [FlxKey.fromString(killBind)]);
 	}
 
 	function removeKeyboard()
