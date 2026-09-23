@@ -285,6 +285,8 @@ class PlayState extends MusicBeatState
 
 	var tstatic:FlxSprite = new FlxSprite(0,0).loadGraphic(Paths.image('hank/static','shared'), true, 320, 180);
 	var spookyText:FlxText;
+	// Prewarm Tricky's large atlas before it becomes visible during the song.
+	private var trickyPrewarmTime:Float = 0;
 
 	var spookyRendered:Bool = false;
 	var spookySteps:Int = 0;
@@ -772,8 +774,24 @@ class PlayState extends MusicBeatState
 
 		if (SONG.song.toLowerCase() == 'accelerant') {
 			add(tstatic);
+
+			// HTML5 can stall the first frame that renders Tricky's large atlas.
+			// Render it almost invisibly during the countdown so the browser/GPU
+			// does the texture upload before gameplay reaches Tricky's section.
+			tiky.animation.play('idle', true);
+			tiky.visible = true;
+			tiky.alpha = 0.0001;
+			trickyPrewarmTime = 0.25;
+
+			// Also warm the Impact font and reuse this text object for spooky text.
+			spookyText = new FlxText(0, 0, 0, 'X', 128);
+			spookyText.setFormat(Paths.font('impact.ttf'), 128, FlxColor.RED);
+			spookyText.size = 128;
+			spookyText.bold = true;
+			spookyText.alpha = 0.0001;
+			add(spookyText);
 		}
-		
+
 		trace('starting');
 
 		if (isStoryMode)
@@ -1390,9 +1408,23 @@ class PlayState extends MusicBeatState
 	{
         FlxG.mouse.visible = false;
 
+		if (trickyPrewarmTime > 0)
+		{
+			trickyPrewarmTime -= elapsed;
+			if (trickyPrewarmTime <= 0)
+			{
+				tiky.visible = false;
+				tiky.alpha = 1;
+				spookyText.visible = false;
+				spookyText.alpha = 1;
+			}
+		}
+
 		if (!paused) {
 			curTime = Std.int(FlxG.sound.music.time / 1000);
+			#if !web
 			trace(Std.int(FlxG.sound.music.time / 1000));
+			#end
 
 			if (songStarted) {
 				if (curTime % 60 == 0) {
@@ -1405,7 +1437,9 @@ class PlayState extends MusicBeatState
 				}
 			}
 
+			#if !web
 			trace(curMinute+':'+curSecond);
+			#end
 		}
 
 		#if !debug
@@ -2266,7 +2300,11 @@ class PlayState extends MusicBeatState
 										notes.remove(daNote, true);
 										daNote.destroy();
 										boyfriend.playAnim('shot', true);
+										#if !web
+										#if !web
 										trace("warning note missed");
+										#end
+										#end
 									}
 								else if (daNote.noteType == 2)
 									{
@@ -3541,19 +3579,21 @@ class PlayState extends MusicBeatState
 		tstatic.alpha = 0.6;
 		spookyRendered = true;
 		FlxG.sound.play(Paths.sound('staticSound'));
-		spookyText = new FlxText(FlxG.random.float(x + 130, x + 220), FlxG.random.float(y + 200, y + 300));
-		spookyText.setFormat(Paths.font('impact.ttf'), 128, FlxColor.RED);
-		spookyText.size = 128;
-		spookyText.bold = true;
+
+		// Reuse the prewarmed text object so Tricky's entrance does not
+		// allocate/load a new large font text object during gameplay.
+		spookyText.x = FlxG.random.float(x + 130, x + 220);
+		spookyText.y = FlxG.random.float(y + 200, y + 300);
 		spookyText.text = text;
-		add(spookyText);
+		spookyText.visible = true;
+		spookyText.alpha = 1;
 	}
 
 	var resetSpookyText:Bool = true;
 
 	function removeSpookyText()
 	{
-		remove(spookyText);
+		spookyText.visible = false;
 		spookyRendered = false;
 		tstatic.alpha = 0;
 	}
@@ -3593,7 +3633,7 @@ class PlayState extends MusicBeatState
 			{
 				if (resetSpookyText)
 				{
-					remove(spookyText);
+					spookyText.visible = false;
 					spookyRendered = false;
 				}
 				tstatic.alpha = 0;
