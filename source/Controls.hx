@@ -576,25 +576,15 @@ class Controls extends FlxActionSet
 			removeGamepad();
 		KeyBinds.keyCheck();
 
-		var upBind:String = FlxG.save.data.upBind;
-		var downBind:String = FlxG.save.data.downBind;
-		var leftBind:String = FlxG.save.data.leftBind;
-		var rightBind:String = FlxG.save.data.rightBind;
-		var killBind:String = FlxG.save.data.killBind;
-		var gpupBind:String = FlxG.save.data.gpupBind;
-		var gpdownBind:String = FlxG.save.data.gpdownBind;
-		var gpleftBind:String = FlxG.save.data.gpleftBind;
-		var gprightBind:String = FlxG.save.data.gprightBind;
-
-		if (upBind == null || upBind.length == 0) upBind = "W";
-		if (downBind == null || downBind.length == 0) downBind = "S";
-		if (leftBind == null || leftBind.length == 0) leftBind = "A";
-		if (rightBind == null || rightBind.length == 0) rightBind = "D";
-		if (killBind == null || killBind.length == 0) killBind = "R";
-		if (gpupBind == null || gpupBind.length == 0) gpupBind = "DPAD_UP";
-		if (gpdownBind == null || gpdownBind.length == 0) gpdownBind = "DPAD_DOWN";
-		if (gpleftBind == null || gpleftBind.length == 0) gpleftBind = "DPAD_LEFT";
-		if (gprightBind == null || gprightBind.length == 0) gprightBind = "DPAD_RIGHT";
+		var upBind:String = normalizeBinding(FlxG.save.data.upBind, "W");
+		var downBind:String = normalizeBinding(FlxG.save.data.downBind, "S");
+		var leftBind:String = normalizeBinding(FlxG.save.data.leftBind, "A");
+		var rightBind:String = normalizeBinding(FlxG.save.data.rightBind, "D");
+		var killBind:String = normalizeBinding(FlxG.save.data.killBind, "R");
+		var gpupBind:String = normalizeBinding(FlxG.save.data.gpupBind, "DPAD_UP");
+		var gpdownBind:String = normalizeBinding(FlxG.save.data.gpdownBind, "DPAD_DOWN");
+		var gpleftBind:String = normalizeBinding(FlxG.save.data.gpleftBind, "DPAD_LEFT");
+		var gprightBind:String = normalizeBinding(FlxG.save.data.gprightBind, "DPAD_RIGHT");
 
 		FlxG.save.data.upBind = upBind;
 		FlxG.save.data.downBind = downBind;
@@ -625,6 +615,18 @@ class Controls extends FlxActionSet
 		inline bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
 		inline bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
 		inline bindKeys(Control.RESET, [FlxKey.fromString(killBind)]);
+	}
+
+	inline static function normalizeBinding(value:Dynamic, fallback:String):String
+	{
+		if (value == null)
+			return fallback;
+
+		var normalized = Std.string(value);
+		if (normalized == "" || normalized == "null" || normalized == "undefined")
+			return fallback;
+
+		return normalized;
 	}
 
 	function removeKeyboard()
