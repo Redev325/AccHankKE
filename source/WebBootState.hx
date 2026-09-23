@@ -22,6 +22,12 @@ class WebBootState extends FlxState
         {
             FlxG.switchState(new TitleState());
         });
+
+        Assets.loadLibrary("game").onError(function(error)
+        {
+            status.text = "Game asset loading failed. Check the browser console.";
+            trace(error);
+        });
     }
 }
 #end
