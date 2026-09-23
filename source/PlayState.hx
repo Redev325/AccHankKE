@@ -1299,7 +1299,7 @@ class PlayState extends MusicBeatState
 			babyArrow.alpha = 0;
 			var receptorAlpha:Float = 0.8;
 			if (PlayStateChangeables.useMiddleScroll && !PlayStateChangeables.Optimize && player == 0)
-				receptorAlpha = 1;
+				receptorAlpha = 0.35;
 			FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: receptorAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
 
 			babyArrow.ID = i;
