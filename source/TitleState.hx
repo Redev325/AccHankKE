@@ -311,27 +311,26 @@ class TitleState extends MusicBeatState
 				titleText.animation.play('press');
 
 			FlxG.camera.flash(FlxColor.WHITE, 1);
-			#if web
-			// The browser permits audio after this user gesture. The menu track
-			// is part of the tiny startup library, so it is immediately available.
-			FlxG.sound.playMusic(Paths.music('freakyMenu', 'startup'), 0.7);
-			FlxG.sound.play(Paths.sound('confirmMenu', 'startup'), 0.7);
-			#end
-			#if !web
-			FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
-			#end
 
 			transitioning = true;
 			MainMenuState.firstStart = true;
 
 			#if web
+			// Audio is intentionally loaded only after the user presses Enter.
+			// The game library contains the music and confirm sound.
 			Assets.loadLibrary("game").onComplete(function(_)
 			{
+				FlxG.sound.playMusic(Paths.music('freakyMenu'), 0.7);
+				FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
+
 				Assets.loadLibrary("fonts").onComplete(function(_)
 				{
 					Assets.loadLibrary("shared").onComplete(function(_)
 					{
-						FlxG.switchState(new SaveKeybinds());
+						new FlxTimer().start(2, function(tmr:FlxTimer)
+						{
+							FlxG.switchState(new SaveKeybinds());
+						});
 					});
 				});
 			}).onError(function(error)
@@ -339,6 +338,8 @@ class TitleState extends MusicBeatState
 				trace(error);
 			});
 			#else
+			FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
+
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
 				FlxG.switchState(new SaveKeybinds());
