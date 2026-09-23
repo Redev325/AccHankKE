@@ -50,7 +50,9 @@
 
 	<assets path="assets/songs" library="songs" exclude="*.mp3|*.DS_Store" embed="false" preload="false" if="web"/>
 	<assets path="assets/songs" library="songs" exclude="*.mp3" unless="web"/>
-	<assets path="assets/shared" library="shared" exclude="*.mp3|*.DS_Store" embed="false" preload="false" if="web"/>
+	<!-- Main-menu graphics are loaded synchronously by FlxSprite.loadGraphic on HTML5,
+	     so keep this library embedded. Songs remain external/lazy below. -->
+	<assets path="assets/shared" library="shared" exclude="*.mp3|*.DS_Store" embed="true" preload="false" if="web"/>
 	<assets path="assets/shared" library="shared" exclude="*.mp3" unless="web"/>
 
 	<assets path='art/readme.txt' rename='do NOT readme.txt' unless="web" />
