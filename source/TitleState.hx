@@ -59,6 +59,9 @@ class TitleState extends MusicBeatState
 	{
 		// Bind and initialize the save before touching save.data. MusicBeatState.create()
 		// also reads fpsCap, so this must happen before super.create().
+		FlxG.save.bind('accelerantke', 'gamingbottomtext');
+		PlayerSettings.init();
+		KadeEngineData.initSave();
 
 		#if sys
 		if (!sys.FileSystem.exists(Sys.getCwd() + "/assets/replays"))
@@ -94,9 +97,6 @@ class TitleState extends MusicBeatState
 		trace('NEWGROUNDS LOL');
 		#end
 
-		FlxG.save.bind('accelerantke', 'gamingbottomtext');
-
-		KadeEngineData.initSave();
 
 		// var file:SMFile = SMFile.loadFile("file.sm");
 		// this was testing things
