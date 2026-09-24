@@ -272,7 +272,7 @@ class Note extends FlxSprite
 		// Middle Scroll keeps opponent moving notes translucent while
 		// player notes remain fully visible.
 		if (!mustPress && !wasGoodHit)
-			alpha = PlayStateChangeables.useMiddleScroll ? 0.35 : 1;
+			alpha = PlayStateChangeables.useMiddleScroll ? 0.5 : 1;
 		else if (mustPress)
 			alpha = 1;
 
