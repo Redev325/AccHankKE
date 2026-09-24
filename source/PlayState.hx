@@ -2240,6 +2240,7 @@ class PlayState extends MusicBeatState
 						daNote.x = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].x;
 						if (!daNote.isSustainNote)
 							daNote.angle = playerStrums.members[Math.floor(Math.abs(daNote.noteData))].angle;
+						// Player notes are always fully visible.
 						daNote.alpha = 1;
 					}
 					else if (!daNote.wasGoodHit && !daNote.modifiedByLua)
@@ -2248,8 +2249,8 @@ class PlayState extends MusicBeatState
 						daNote.x = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].x;
 						if (!daNote.isSustainNote)
 							daNote.angle = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].angle;
-						// In Middle Scroll the opponent's moving notes are translucent,
-						// while the player's moving notes remain fully visible.
+						// Middle Scroll: opponent notes fade back while the player's
+						// notes stay fully visible in the centered lane.
 						daNote.alpha = PlayStateChangeables.useMiddleScroll ? 0.35 : 1;
 					}
 					
@@ -2751,10 +2752,11 @@ class PlayState extends MusicBeatState
 			if (PlayStateChangeables.useMiddleScroll)
 			{
 				var middlePlayerStart:Float = (FlxG.width - (Note.swagWidth * 4)) / 2;
-				var feedbackRightEdge:Float = middlePlayerStart - 35;
-				rating.x = feedbackRightEdge - rating.width;
-				comboSpr.x = rating.x;
-				currentTimingShown.x = comboSpr.x + comboSpr.width + 12;
+				var feedbackRightEdge:Float = middlePlayerStart - 40;
+				var feedbackLeft:Float = feedbackRightEdge - rating.width;
+				rating.x = feedbackLeft;
+				comboSpr.x = feedbackLeft;
+				currentTimingShown.x = feedbackLeft + comboSpr.width + 12;
 			}
 	
 			currentTimingShown.cameras = [camHUD];
