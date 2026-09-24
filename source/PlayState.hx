@@ -2213,7 +2213,7 @@ class PlayState extends MusicBeatState
 							});
 						}
 
-						if (!daNote.isSustainNote)
+						if (!daNote.isSustainNote && !PlayStateChangeables.useMiddleScroll)
 							spawnNoteSplashOnNoteDad(daNote);
 	
 						#if windows
@@ -2249,9 +2249,9 @@ class PlayState extends MusicBeatState
 						daNote.x = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].x;
 						if (!daNote.isSustainNote)
 							daNote.angle = strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].angle;
-						// Middle Scroll: opponent notes fade back while the player's
-						// notes stay fully visible in the centered lane.
-						daNote.alpha = PlayStateChangeables.useMiddleScroll ? 0.35 : 1;
+						// Middle Scroll: opponent moving notes are slightly translucent,
+						// while the player's moving notes stay fully visible.
+						daNote.alpha = PlayStateChangeables.useMiddleScroll ? 0.5 : 1;
 					}
 					
 					
@@ -2747,16 +2747,17 @@ class PlayState extends MusicBeatState
 			comboSpr.updateHitbox();
 			rating.updateHitbox();
 
-			// In Middle Scroll, keep the rating/combo feedback to the left of
-			// the centered player strumline, matching the supplied concept.
+			// In Middle Scroll, keep all hit feedback in the empty gap between
+			// the left opponent lanes and the centered player lanes.
+			// This keeps the rating/combo from covering either set of notes.
 			if (PlayStateChangeables.useMiddleScroll)
 			{
 				var middlePlayerStart:Float = (FlxG.width - (Note.swagWidth * 4)) / 2;
-				var feedbackRightEdge:Float = middlePlayerStart - 40;
-				var feedbackLeft:Float = feedbackRightEdge - rating.width;
-				rating.x = feedbackLeft;
-				comboSpr.x = feedbackLeft;
-				currentTimingShown.x = feedbackLeft + comboSpr.width + 12;
+				var leftOpponentEnd:Float = 25 + (Note.swagWidth * 2);
+				var feedbackGapCenter:Float = (leftOpponentEnd + middlePlayerStart) * 0.5;
+				rating.x = feedbackGapCenter - (rating.width * 0.5);
+				comboSpr.x = feedbackGapCenter - (comboSpr.width * 0.5);
+				currentTimingShown.x = feedbackGapCenter - (currentTimingShown.width * 0.5);
 			}
 	
 			currentTimingShown.cameras = [camHUD];
@@ -2791,7 +2792,13 @@ class PlayState extends MusicBeatState
 				var numScore:FlxSprite = new FlxSprite().loadGraphic(Paths.image('num' + Std.int(i)));
 				numScore.screenCenter(X);
 				if (PlayStateChangeables.useMiddleScroll)
-					numScore.x = comboSpr.x + (43 * daLoop);
+				{
+					var middlePlayerStart:Float = (FlxG.width - (Note.swagWidth * 4)) / 2;
+					var leftOpponentEnd:Float = 25 + (Note.swagWidth * 2);
+					var feedbackGapCenter:Float = (leftOpponentEnd + middlePlayerStart) * 0.5;
+					var comboWidth:Float = (seperatedScore.length - 1) * 43;
+					numScore.x = feedbackGapCenter - (comboWidth * 0.5) + (43 * daLoop) - (numScore.width * 0.5);
+				}
 				else
 					numScore.x = 680 + (43 * daLoop);
 				numScore.cameras = [camHUD];
