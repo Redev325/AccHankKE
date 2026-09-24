@@ -2745,6 +2745,17 @@ class PlayState extends MusicBeatState
 			currentTimingShown.updateHitbox();
 			comboSpr.updateHitbox();
 			rating.updateHitbox();
+
+			// In Middle Scroll, keep the rating/combo feedback to the left of
+			// the centered player strumline, matching the supplied concept.
+			if (PlayStateChangeables.useMiddleScroll)
+			{
+				var middlePlayerStart:Float = (FlxG.width - (Note.swagWidth * 4)) / 2;
+				var feedbackRightEdge:Float = middlePlayerStart - 35;
+				rating.x = feedbackRightEdge - rating.width;
+				comboSpr.x = rating.x;
+				currentTimingShown.x = comboSpr.x + comboSpr.width + 12;
+			}
 	
 			currentTimingShown.cameras = [camHUD];
 			comboSpr.cameras = [camHUD];
@@ -2777,12 +2788,18 @@ class PlayState extends MusicBeatState
 			{
 				var numScore:FlxSprite = new FlxSprite().loadGraphic(Paths.image('num' + Std.int(i)));
 				numScore.screenCenter(X);
-				numScore.x = 680 + (43 * daLoop);
+				if (PlayStateChangeables.useMiddleScroll)
+					numScore.x = comboSpr.x + (43 * daLoop);
+				else
+					numScore.x = 680 + (43 * daLoop);
 				numScore.cameras = [camHUD];
 				numScore.y += 170;
 
-				numScore.x -= 150;
-				numScore.x += 70;
+				if (!PlayStateChangeables.useMiddleScroll)
+				{
+					numScore.x -= 150;
+					numScore.x += 70;
+				}
 
 				if (!curStage.startsWith('school'))
 				{
