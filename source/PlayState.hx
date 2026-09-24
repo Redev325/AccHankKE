@@ -285,8 +285,10 @@ class PlayState extends MusicBeatState
 
 	var tstatic:FlxSprite = new FlxSprite(0,0).loadGraphic(Paths.image('hank/static','shared'), true, 320, 180);
 	var spookyText:FlxText;
-	// Prewarm Tricky's large atlas before it becomes visible during the song.
+	// Prewarm large Tricky/Hell Clown textures before their entrances so
+	// HTML5 does not upload them on the gameplay frame.
 	private var trickyPrewarmTime:Float = 0;
+	private var hellclownPrewarmTime:Float = 0;
 
 	var spookyRendered:Bool = false;
 	var spookySteps:Int = 0;
@@ -755,9 +757,10 @@ class PlayState extends MusicBeatState
 		grpNoteSplashes.add(splash);
 		splash.alpha = 0.0;
 
-		hellclownShader = new FlxSprite(-100, -100).makeGraphic(2000, 2000, FlxColor.RED);
+		hellclownShader = new FlxSprite(-100, -100).makeGraphic(FlxG.width + 200, FlxG.height + 200, FlxColor.RED);
 		hellclownShader.alpha = 0.456;
 		hellclownShader.visible = false;
+		hellclownShader.active = false;
 		add(hellclownShader);
 
 		grpNoteSplashes.cameras = [camHUD];
@@ -783,6 +786,29 @@ class PlayState extends MusicBeatState
 			tiky.visible = true;
 			tiky.alpha = 0.0001;
 			trickyPrewarmTime = 0.25;
+
+			// Prewarm Hell Clown and both hand atlases before beat 248.
+			// Temporarily draw them almost invisibly during the countdown so their
+			// first real frame does not trigger a large HTML5 texture upload.
+			hellclown.animation.play('idle', true);
+			hellclown.visible = true;
+			hellclown.alpha = 0.0001;
+			hellclown.x = 164;
+			hellclown.y = FlxG.height * 0.25;
+
+			hellclownhand1.visible = true;
+			hellclownhand1.alpha = 0.0001;
+			hellclownhand1.x = 50;
+			hellclownhand1.y = FlxG.height * 0.25;
+
+			hellclownhand2.visible = true;
+			hellclownhand2.alpha = 0.0001;
+			hellclownhand2.x = FlxG.width - 250;
+			hellclownhand2.y = FlxG.height * 0.25;
+
+			hellclownShader.visible = true;
+			hellclownShader.alpha = 0.0001;
+			hellclownPrewarmTime = 0.5;
 
 			// Also warm the Impact font and reuse this text object for spooky text.
 			spookyText = new FlxText(0, 0, 0, 'X', 128);
@@ -1444,6 +1470,31 @@ class PlayState extends MusicBeatState
 				tiky.alpha = 1;
 				spookyText.visible = false;
 				spookyText.alpha = 1;
+			}
+		}
+
+		if (hellclownPrewarmTime > 0)
+		{
+			hellclownPrewarmTime -= elapsed;
+			if (hellclownPrewarmTime <= 0)
+			{
+				hellclown.x = 164;
+				hellclown.y = 2000;
+				hellclown.alpha = 1;
+				hellclown.visible = true;
+
+				hellclownhand1.x = -212;
+				hellclownhand1.y = 2000;
+				hellclownhand1.alpha = 1;
+				hellclownhand1.visible = true;
+
+				hellclownhand2.x = 936;
+				hellclownhand2.y = 2000;
+				hellclownhand2.alpha = 1;
+				hellclownhand2.visible = true;
+
+				hellclownShader.visible = false;
+				hellclownShader.alpha = 0.456;
 			}
 		}
 
@@ -3795,7 +3846,8 @@ class PlayState extends MusicBeatState
 			//if (FlxG.save.data.distractions) {	Who da fuck put this here?? This literally causes no events to run if user disables the option
 			sanford.animation.play('bop');
 			deimos.animation.play('bop');
-			hellclown.animation.play('idle');
+			if (hellclownIsThere)
+				hellclown.animation.play('idle');
 
 			switch (curBeat) {	
 				case 6:
